@@ -23,20 +23,25 @@ import (
 )
 
 func TestCivilians(t *testing.T) {
-	m := wge.NewCivilian(100, 2).Merge(wge.NewCivilian(100, 2))
-	if m.TechLevel() != 2 {
-		t.Errorf("merge: expected tech-level %d, got %d\n", 2, m.TechLevel())
-	}
-	m = wge.NewCivilian(100, 2).Merge(wge.NewCivilian(100, 4))
-	if m.TechLevel() != 3 {
-		t.Errorf("merge: expected tech-level %d, got %d\n", 3, m.TechLevel())
-	}
-	m = wge.NewCivilian(100, 2).Merge(wge.NewCivilian(100, 6))
-	if m.TechLevel() != 4 {
-		t.Errorf("merge: expected tech-level %d, got %d\n", 4, m.TechLevel())
-	}
-	m = wge.NewCivilian(300, 2).Merge(wge.NewCivilian(100, 6))
-	if m.TechLevel() != 3 {
-		t.Errorf("merge: expected tech-level %d, got %d\n", 3, m.TechLevel())
+	// verify that when tech is merged, we use the weighted
+	// average (rounded down) for the new population
+	for _, tc := range []struct {
+		id          int
+		pPop, pTech int
+		qPop, qTech int
+		expect      int
+	}{
+		{1, 100, 2, 100, 2, 2},
+		{2, 100, 2, 100, 4, 3},
+		{3, 100, 2, 100, 6, 4},
+		{4, 300, 2, 100, 6, 3},
+		{5, 100, 10, 1000, 1, 1},
+	} {
+		p := wge.NewCivilian(tc.pPop, tc.pTech)
+		q := wge.NewCivilian(tc.qPop, tc.qTech)
+		m := p.Merge(q)
+		if tc.expect != m.TechLevel() {
+			t.Errorf("merge: %d: expected tech-level %d, got %d\n", tc.id, tc.expect, m.TechLevel())
+		}
 	}
 }

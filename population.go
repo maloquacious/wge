@@ -60,22 +60,37 @@ func (p Civilian) LifeSupportNeeded() float64 {
 	return float64(p.qty.loyal+p.qty.rebel) * 0.01 * 0.5
 }
 
-// Merge combines two units.
-// Rebel population and tech levels are recalculated on merge.
+// Merge combines two population units.
+// Rebel population and tech levels are calculated as the weighted average of the units.
 func (p Civilian) Merge(q Civilian) Civilian {
 	if p.Population() == 0 {
 		return q
 	} else if q.Population() == 0 {
 		return p
 	}
+
 	var n Civilian
 	n.qty.loyal, n.qty.rebel = p.qty.loyal+q.qty.loyal, p.qty.rebel+q.qty.rebel
+	deltaRebels := 0 // merging units always increases discontent
 	if p.techLevel == q.techLevel {
 		n.techLevel = p.techLevel
 	} else {
 		pTech, qTech := p.Population()*p.techLevel, q.Population()*q.techLevel
 		n.techLevel = (pTech + qTech) / (p.Population() + q.Population())
+		// the group losing tech levels gets especially cranky
+		if n.techLevel < p.techLevel {
+			deltaTech := p.techLevel - n.techLevel
+			deltaRebels = p.qty.rebel * deltaTech / 100
+		} else if n.techLevel < q.techLevel {
+			deltaTech := p.techLevel - n.techLevel
+			deltaRebels = p.qty.rebel * deltaTech / 100
+		}
 	}
+	if deltaRebels < 1 {
+		deltaRebels = 1
+	}
+	n.qty.loyal, n.qty.rebel = n.qty.loyal-deltaRebels, n.qty.rebel+deltaRebels
+
 	return n
 }
 
