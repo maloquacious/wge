@@ -17,13 +17,15 @@
 package wge
 
 type Population interface {
-	// the number of FOOD units needed to sustain the population.
+	// Births returns the number of new units added from natural births.
+	Births() int
+	// FoodNeeded returns the number of FOOD units needed to sustain the population.
 	FoodNeeded() float64
-	// the number of LS units needed to sustain the population
+	// LifeSupportNeeded returns the number of LS units needed to sustain the population.
 	LifeSupportNeeded() float64
-	// Population is the total population of the unit.
+	// Population returns total population of the unit.
 	Population() int
-	// Rebels is the number of rebels in the populations.
+	// Rebels returns the number of rebels in the population.
 	Rebels() int
 }
 
@@ -45,6 +47,27 @@ func NewCivilian(pop, techLevel int) Civilian {
 	return p
 }
 
+// Births implements the Population interface.
+// The basic birth rate ranges from 0.25% to 10% of the population.
+// The variation depends on the standard of living as well as the
+// availability of "open" living space in the colony.
+func (p Civilian) Births(standardOfLiving, pctCapacity float64) int {
+	if p.IsOnShip() { // births never happen on a ship
+		return 0
+	}
+
+	// rate is determined by tech level, standard of living, and how crowded the colony is.
+	birthRate := float64(11-p.techLevel) * standardOfLiving * (1.0 - pctCapacity)
+	// birth rate is never less than 0.25% or higher than 10%
+	if birthRate < 0.0025 {
+		birthRate = 0.0025
+	} else if birthRate > 0.1 {
+		birthRate = 0.1
+	}
+
+	return int(float64(p.Population()) * birthRate)
+}
+
 // Code implements the Unit interface.
 func (p Civilian) Code() string {
 	return "UNK"
@@ -53,6 +76,11 @@ func (p Civilian) Code() string {
 // FoodNeeded implements the Population interface
 func (p Civilian) FoodNeeded() float64 {
 	return float64(p.qty.loyal+p.qty.rebel) * 0.01 * 0.0125
+}
+
+// IsOnShip returns true if the population is on a ship.
+func (p Civilian) IsOnShip() bool {
+	return false
 }
 
 // LifeSupportNeeded implements the Population interface
