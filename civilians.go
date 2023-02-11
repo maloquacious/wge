@@ -205,7 +205,7 @@ func (p Civilian) TechLevel() int {
 	return p.techLevel
 }
 
-// UnmarshalJSON implements the json.Marshaler interface
+// UnmarshalJSON implements the json.Unmarshaler interface
 func (p *Civilian) UnmarshalJSON(data []byte) error {
 	dec := json.NewDecoder(bytes.NewReader(data))
 
