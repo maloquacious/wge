@@ -34,7 +34,7 @@ func NewCivilian(pop, techLevel int) Civilian {
 	return p
 }
 
-// BirthRate implements the Population interface.
+// BirthRate implements the PopulationGroup interface.
 // The basic birth rate ranges from 0.25% to 10% of the population.
 // The variation depends on the standard of living as well as the
 // availability of "open" living space in the colony.
@@ -101,7 +101,7 @@ func (p Civilian) Code() string {
 	return "UNK"
 }
 
-// FoodNeeded implements the Population interface
+// FoodNeeded implements the PopulationGroup interface
 func (p Civilian) FoodNeeded() float64 {
 	return float64(p.qty.loyal+p.qty.rebel) * 0.01 * 0.0125
 }
@@ -116,7 +116,7 @@ func (p Civilian) IsOnShip() bool {
 	return false
 }
 
-// LifeSupportNeeded implements the Population interface
+// LifeSupportNeeded implements the PopulationGroup interface
 func (p Civilian) LifeSupportNeeded() float64 {
 	return float64(p.qty.loyal+p.qty.rebel) * 0.01 * 0.5
 }
@@ -155,12 +155,12 @@ func (p Civilian) Merge(q Civilian) Civilian {
 	return n
 }
 
-// Population implements the Population interface.
+// Population implements the PopulationGroup interface.
 func (p Civilian) Population() int {
 	return p.qty.loyal + p.qty.rebel
 }
 
-// Rebels implements the Population interface.
+// Rebels implements the PopulationGroup interface.
 func (p Civilian) Rebels() int {
 	return p.qty.rebel
 }
