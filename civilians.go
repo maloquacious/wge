@@ -48,68 +48,6 @@ func NewCivilian(pop, techLevel int) Civilian {
 	return p
 }
 
-// BirthRate implements the PopulationGroup interface.
-// The basic birth rate ranges from 0.25% to 10% of the population.
-// The variation depends on the standard of living as well as the
-// availability of "open" living space in the colony.
-func (p Civilian) BirthRate(standardOfLiving, pctCapacity float64) float64 {
-	if p.IsOnShip() { // births never happen on a ship
-		return 0
-	}
-
-	// clamp the standard of living and percent capacity
-	standardOfLiving = clamp(standardOfLiving, 0.01, 3.0)
-	pctCapacity = clamp(pctCapacity, 0.01, 1.0)
-
-	// the base rate is determined by tech level
-	birthRate := float64(11-p.techLevel) * 0.1
-	if birthRate < 0.0025 {
-		birthRate = 0.0025
-	} else if birthRate > 0.10 {
-		birthRate = 0.10
-	}
-
-	// resort colonies increase the birth rate
-	if p.IsResortColony() {
-		birthRate *= 2
-	}
-
-	// standard of living influences it
-	if standardOfLiving < 0.25 {
-		birthRate *= 1.5
-	} else if standardOfLiving < 0.80 {
-		birthRate *= 1.25
-	} else if standardOfLiving < 1.20 {
-		// 80% to 120% is the standard range
-	} else if standardOfLiving > 1.20 {
-		birthRate *= 0.75
-	} else if standardOfLiving > 1.75 {
-		birthRate *= 0.5
-	}
-
-	// overcrowding reduces the birth rate
-	if pctCapacity < 0.25 {
-		birthRate *= 1.25
-	} else if pctCapacity < 0.40 {
-		birthRate *= 1.10
-	} else if pctCapacity < 0.65 {
-		// 40% to 65% is the standard range
-	} else if pctCapacity < 0.70 {
-		birthRate *= 0.90
-	} else if pctCapacity < 0.80 {
-		birthRate *= 0.60
-	} else if pctCapacity < 0.90 {
-		birthRate *= 0.25
-	} else if pctCapacity < 0.95 {
-		birthRate *= 0.1
-	} else {
-		birthRate *= 0.05
-	}
-
-	// birth rate is never less than 0.25% or higher than 10%
-	return clamp(birthRate, 0.0025, 0.10)
-}
-
 // Code implements the Unit interface.
 func (p Civilian) Code() string {
 	return "CIV"
@@ -182,6 +120,68 @@ func (p Civilian) Merge(q Civilian) Civilian {
 	n.qty.loyal, n.qty.rebel = n.qty.loyal-deltaRebels, n.qty.rebel+deltaRebels
 
 	return n
+}
+
+// NaturalBirthRate implements the PopulationGroup interface.
+// The basic birth rate ranges from 0.25% to 10% of the population.
+// The variation depends on the standard of living as well as the
+// availability of "open" living space in the colony.
+func (p Civilian) NaturalBirthRate(standardOfLiving, pctCapacity float64) float64 {
+	if p.IsOnShip() { // births never happen on a ship
+		return 0
+	}
+
+	// clamp the standard of living and percent capacity
+	standardOfLiving = clamp(standardOfLiving, 0.01, 3.0)
+	pctCapacity = clamp(pctCapacity, 0.01, 1.0)
+
+	// the base rate is determined by tech level
+	birthRate := float64(11-p.techLevel) * 0.1
+	if birthRate < 0.0025 {
+		birthRate = 0.0025
+	} else if birthRate > 0.10 {
+		birthRate = 0.10
+	}
+
+	// resort colonies increase the birth rate
+	if p.IsResortColony() {
+		birthRate *= 2
+	}
+
+	// standard of living influences it
+	if standardOfLiving < 0.25 {
+		birthRate *= 1.5
+	} else if standardOfLiving < 0.80 {
+		birthRate *= 1.25
+	} else if standardOfLiving < 1.20 {
+		// 80% to 120% is the standard range
+	} else if standardOfLiving > 1.20 {
+		birthRate *= 0.75
+	} else if standardOfLiving > 1.75 {
+		birthRate *= 0.5
+	}
+
+	// overcrowding reduces the birth rate
+	if pctCapacity < 0.25 {
+		birthRate *= 1.25
+	} else if pctCapacity < 0.40 {
+		birthRate *= 1.10
+	} else if pctCapacity < 0.65 {
+		// 40% to 65% is the standard range
+	} else if pctCapacity < 0.70 {
+		birthRate *= 0.90
+	} else if pctCapacity < 0.80 {
+		birthRate *= 0.60
+	} else if pctCapacity < 0.90 {
+		birthRate *= 0.25
+	} else if pctCapacity < 0.95 {
+		birthRate *= 0.1
+	} else {
+		birthRate *= 0.05
+	}
+
+	// birth rate is never less than 0.25% or higher than 10%
+	return clamp(birthRate, 0.0025, 0.10)
 }
 
 // Population implements the PopulationGroup interface.

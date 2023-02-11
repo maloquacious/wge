@@ -18,12 +18,12 @@ package wge
 
 // PopulationGroup defines the interface for working with groups of people.
 type PopulationGroup interface {
-	// BirthRate returns the percentage of natural births in the group.
-	BirthRate() float64
 	// FoodNeeded returns the number of FOOD units needed to sustain the population.
 	FoodNeeded() float64
 	// LifeSupportNeeded returns the number of LS units needed to sustain the population.
 	LifeSupportNeeded() float64
+	// NaturalBirthRate returns the percentage of natural births in the group.
+	NaturalBirthRate() float64
 	// Population returns total population of the unit.
 	Population() int
 	// Rebels returns the number of rebels in the population.
