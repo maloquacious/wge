@@ -60,9 +60,31 @@ func TestCivilians(t *testing.T) {
 		{5, 10, 2, 0.9, 0.0075},
 	} {
 		p := wge.NewCivilian(1000, tc.techLevel)
-		birthRate := p.BirthRate(tc.standardOfLiving, tc.pctCapacity)
+		birthRate := p.NaturalBirthRate(tc.standardOfLiving, tc.pctCapacity)
 		if !isClose(tc.expect, birthRate) {
-			t.Errorf("birthRate: %d: expected %f, got %f\n", tc.id, tc.expect, birthRate)
+			t.Errorf("birthRate: %d: expected %8.4f%%, got %8.4f%%\n", tc.id, 100*tc.expect, 100*birthRate)
+		}
+	}
+
+	// check death rates
+	for _, tc := range []struct {
+		id               int
+		techLevel        int
+		standardOfLiving float64
+		pctCapacity      float64
+		expect           float64
+	}{
+		{1, 10, 1, 0.50, 0.00_5000},
+		{2, 5, 1, 0.50, 0.01_0000},
+		{3, 1, 1, 0.50, 0.01_4000},
+		{4, 10, 0.25, 0.50, 0.00_5875},
+		{5, 10, 2, 0.50, 0.00_4875},
+		{6, 10, 1, 0.99, 0.00_6250},
+	} {
+		p := wge.NewCivilian(1000, tc.techLevel)
+		deathRate := p.NaturalDeathRate(tc.standardOfLiving, tc.pctCapacity)
+		if !isClose(tc.expect, deathRate) {
+			t.Errorf("deathRate: %d: expected %8.4f%%, got %8.4f%%\n", tc.id, 100*tc.expect, 100*deathRate)
 		}
 	}
 }

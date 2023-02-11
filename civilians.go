@@ -58,13 +58,29 @@ func (p Civilian) FoodNeeded() float64 {
 	return float64(p.qty.loyal+p.qty.rebel) * 0.01 * 0.0125
 }
 
-// IsResortColony returns true if the population is in a resort colony
-func (p Civilian) IsResortColony() bool {
+// IsOnClosedColony returns true if the population is on a closed colony.
+func (p Civilian) IsOnClosedColony() bool {
+	return false
+}
+
+// IsOnLifeSupport returns true if the population depends on life support for survival.
+// This is true for all ships and closed colonies.
+func (p Civilian) IsOnLifeSupport() bool {
+	return p.IsOnShip() || p.IsOnClosedColony()
+}
+
+// IsOnOpenColony returns true if the population is on an open colony.
+func (p Civilian) IsOnOpenColony() bool {
 	return false
 }
 
 // IsOnShip returns true if the population is on a ship.
 func (p Civilian) IsOnShip() bool {
+	return false
+}
+
+// IsResortColony returns true if the population is in a resort colony
+func (p Civilian) IsResortColony() bool {
 	return false
 }
 
@@ -182,6 +198,90 @@ func (p Civilian) NaturalBirthRate(standardOfLiving, pctCapacity float64) float6
 
 	// birth rate is never less than 0.25% or higher than 10%
 	return clamp(birthRate, 0.0025, 0.10)
+}
+
+// NaturalDeathRate implements the PopulationGroup interface.
+// The basic death rate ranges from 0.25% to 10% of the population.
+// The variation depends on the standard of living as well as the
+// availability of "open" living space in the colony.
+func (p Civilian) NaturalDeathRate(standardOfLiving, pctCapacity float64) float64 {
+	// clamp the standard of living and percent capacity
+	standardOfLiving = clamp(standardOfLiving, 0.01, 3.0)
+	pctCapacity = clamp(pctCapacity, 0.01, 1.0)
+
+	// the base rate is determined by tech level
+	var deathRate float64
+	switch p.techLevel {
+	case 0:
+		deathRate = 1_500.0 / 100_000
+	case 1:
+		deathRate = 1_400.0 / 100_000
+	case 2:
+		deathRate = 1_300.0 / 100_000
+	case 3:
+		deathRate = 1_200.0 / 100_000
+	case 4:
+		deathRate = 1_100.0 / 100_000
+	case 5:
+		deathRate = 1_000.0 / 100_000
+	case 6:
+		deathRate = 900.0 / 100_000
+	case 7:
+		deathRate = 800.0 / 100_000
+	case 8:
+		deathRate = 700.0 / 100_000
+	case 9:
+		deathRate = 600.0 / 100_000
+	case 10:
+		deathRate = 500.0 / 100_000
+	default:
+		panic(fmt.Sprintf("assert(0 <= %d <= 10)", p.techLevel))
+	}
+
+	// standard of living influences it
+	if standardOfLiving > 1.50 {
+		deathRate *= 0.975
+	} else if standardOfLiving > 1.25 {
+		deathRate *= 0.950
+	} else if standardOfLiving > 0.99 {
+		// base rate
+	} else if standardOfLiving > 0.875 {
+		deathRate *= 1.025
+	} else if standardOfLiving > 0.75 {
+		deathRate *= 1.050
+	} else if standardOfLiving > 0.625 {
+		deathRate *= 1.075
+	} else if standardOfLiving > 0.5 {
+		deathRate *= 1.100
+	} else if standardOfLiving > 0.375 {
+		deathRate *= 1.125
+	} else if standardOfLiving > 0.25 {
+		deathRate *= 1.150
+	} else if standardOfLiving > 0.125 {
+		deathRate *= 1.175
+	}
+
+	// overcrowding increases it
+	if pctCapacity > 2 {
+		deathRate *= 3.000
+	} else if pctCapacity > 1.5 {
+		deathRate *= 2.000
+	} else if pctCapacity > 0.99 {
+		deathRate *= 1.500
+	} else if pctCapacity > 0.975 {
+		deathRate *= 1.250
+	} else if pctCapacity > 0.95 {
+		deathRate *= 1.100
+	} else if pctCapacity > 0.925 {
+		deathRate *= 1.025
+	} else if pctCapacity > 0.90 {
+		deathRate *= 1.01
+	} else {
+		// base rate
+	}
+
+	// death rate is never less than 0.25% or higher than 75%
+	return clamp(deathRate, 0.0025, 0.75)
 }
 
 // Population implements the PopulationGroup interface.

@@ -24,6 +24,8 @@ type PopulationGroup interface {
 	LifeSupportNeeded() float64
 	// NaturalBirthRate returns the percentage of natural births in the group.
 	NaturalBirthRate() float64
+	// NaturalDeathRate returns the percentage of natural deaths in the group.
+	NaturalDeathRate() float64
 	// Population returns total population of the unit.
 	Population() int
 	// Rebels returns the number of rebels in the population.
