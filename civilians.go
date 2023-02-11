@@ -213,75 +213,75 @@ func (p Civilian) NaturalDeathRate(standardOfLiving, pctCapacity float64) float6
 	var deathRate float64
 	switch p.techLevel {
 	case 0:
-		deathRate = 1_500.0 / 100_000
+		deathRate = 1_500.0 / 100_000.0
 	case 1:
-		deathRate = 1_400.0 / 100_000
+		deathRate = 1_400.0 / 100_000.0
 	case 2:
-		deathRate = 1_300.0 / 100_000
+		deathRate = 1_300.0 / 100_000.0
 	case 3:
-		deathRate = 1_200.0 / 100_000
+		deathRate = 1_200.0 / 100_000.0
 	case 4:
-		deathRate = 1_100.0 / 100_000
+		deathRate = 1_100.0 / 100_000.0
 	case 5:
-		deathRate = 1_000.0 / 100_000
+		deathRate = 1_000.0 / 100_000.0
 	case 6:
-		deathRate = 900.0 / 100_000
+		deathRate = 900.0 / 100_000.0
 	case 7:
-		deathRate = 800.0 / 100_000
+		deathRate = 800.0 / 100_000.0
 	case 8:
-		deathRate = 700.0 / 100_000
+		deathRate = 700.0 / 100_000.0
 	case 9:
-		deathRate = 600.0 / 100_000
+		deathRate = 600.0 / 100_000.0
 	case 10:
-		deathRate = 500.0 / 100_000
+		deathRate = 500.0 / 100_000.0
 	default:
 		panic(fmt.Sprintf("assert(0 <= %d <= 10)", p.techLevel))
 	}
 
 	// standard of living influences it
-	if standardOfLiving > 1.50 {
+	if standardOfLiving > 1.500 {
 		deathRate *= 0.975
-	} else if standardOfLiving > 1.25 {
+	} else if standardOfLiving > 1.250 {
 		deathRate *= 0.950
-	} else if standardOfLiving > 0.99 {
+	} else if standardOfLiving > 0.990 {
 		// base rate
 	} else if standardOfLiving > 0.875 {
 		deathRate *= 1.025
-	} else if standardOfLiving > 0.75 {
+	} else if standardOfLiving > 0.750 {
 		deathRate *= 1.050
 	} else if standardOfLiving > 0.625 {
 		deathRate *= 1.075
-	} else if standardOfLiving > 0.5 {
+	} else if standardOfLiving > 0.500 {
 		deathRate *= 1.100
 	} else if standardOfLiving > 0.375 {
 		deathRate *= 1.125
-	} else if standardOfLiving > 0.25 {
+	} else if standardOfLiving > 0.250 {
 		deathRate *= 1.150
 	} else if standardOfLiving > 0.125 {
 		deathRate *= 1.175
 	}
 
 	// overcrowding increases it
-	if pctCapacity > 2 {
+	if pctCapacity > 2.000 {
 		deathRate *= 3.000
-	} else if pctCapacity > 1.5 {
+	} else if pctCapacity > 1.500 {
 		deathRate *= 2.000
-	} else if pctCapacity > 0.99 {
+	} else if pctCapacity > 0.990 {
 		deathRate *= 1.500
 	} else if pctCapacity > 0.975 {
 		deathRate *= 1.250
-	} else if pctCapacity > 0.95 {
+	} else if pctCapacity > 0.950 {
 		deathRate *= 1.100
 	} else if pctCapacity > 0.925 {
 		deathRate *= 1.025
-	} else if pctCapacity > 0.90 {
-		deathRate *= 1.01
+	} else if pctCapacity > 0.900 {
+		deathRate *= 1.010
 	} else {
 		// base rate
 	}
 
 	// death rate is never less than 0.25% or higher than 75%
-	return clamp(deathRate, 0.0025, 0.75)
+	return clamp(deathRate, 0.00_2500, 0.75_0000)
 }
 
 // Population implements the PopulationGroup interface.
