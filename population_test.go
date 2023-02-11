@@ -44,4 +44,25 @@ func TestCivilians(t *testing.T) {
 			t.Errorf("merge: %d: expected tech-level %d, got %d\n", tc.id, tc.expect, m.TechLevel())
 		}
 	}
+
+	// check birth rates
+	for _, tc := range []struct {
+		id               int
+		techLevel        int
+		standardOfLiving float64
+		pctCapacity      float64
+		expect           float64
+	}{
+		{1, 1, 1, 0.6, 0.10},
+		{2, 2, 0.5, 0.8, 0.03125},
+		{3, 3, 0.75, 0.5, 0.10},
+		{4, 4, 1.25, 0.3, 0.0825},
+		{5, 10, 2, 0.9, 0.0075},
+	} {
+		p := wge.NewCivilian(1000, tc.techLevel)
+		birthRate := p.BirthRate(tc.standardOfLiving, tc.pctCapacity)
+		if !isClose(tc.expect, birthRate) {
+			t.Errorf("birthRate: %d: expected %f, got %f\n", tc.id, tc.expect, birthRate)
+		}
+	}
 }
