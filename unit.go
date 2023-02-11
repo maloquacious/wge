@@ -20,4 +20,10 @@ package wge
 type Unit interface {
 	// Code returns the short display code for the unit.
 	Code() string
+	// Quantity returns the number of items in the unit.
+	Quantity() float64
+	// Mass returns the mass (in metric tonnes) of the unit.
+	Mass() float64
+	// Volume returns the volume (in cubic meters) required to store the unit.
+	Volume() float64
 }

@@ -112,7 +112,7 @@ func (p Civilian) BirthRate(standardOfLiving, pctCapacity float64) float64 {
 
 // Code implements the Unit interface.
 func (p Civilian) Code() string {
-	return "UNK"
+	return "CIV"
 }
 
 // FoodNeeded implements the PopulationGroup interface
@@ -142,6 +142,12 @@ func (p Civilian) MarshalJSON() ([]byte, error) {
 	aux.RebelCitizens = p.qty.rebel
 	aux.TechLevel = p.techLevel
 	return json.Marshal(&aux)
+}
+
+// Mass implements the Unit interface.
+func (p Civilian) Mass() float64 {
+	const massPerUnit = 1.00 // per 100
+	return p.Quantity() * massPerUnit
 }
 
 // Merge combines two population units.
@@ -183,6 +189,12 @@ func (p Civilian) Population() int {
 	return p.qty.loyal + p.qty.rebel
 }
 
+// Quantity implements the Unit interface.
+func (p Civilian) Quantity() float64 {
+	// there are 100 people per population unit
+	return float64(p.Population()) * 0.01
+}
+
 // Rebels implements the PopulationGroup interface.
 func (p Civilian) Rebels() int {
 	return p.qty.rebel
@@ -207,4 +219,10 @@ func (p *Civilian) UnmarshalJSON(data []byte) error {
 	p.techLevel = aux.TechLevel
 
 	return nil
+}
+
+// Volume implements the Unit interface.
+func (p Civilian) Volume() float64 {
+	const volumePerUnit = 1.00 // per 100
+	return p.Quantity() * volumePerUnit
 }
