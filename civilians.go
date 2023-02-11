@@ -16,6 +16,12 @@
 
 package wge
 
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+)
+
 // Civilian is a population unit composed of the bourgeoisie, retirees,
 // stay-at-home parents, and the unemployed.
 // The state can order civilians to relocate to other planets or systems.
@@ -25,6 +31,13 @@ type Civilian struct {
 		rebel int
 	}
 	techLevel int
+}
+
+// auxCivilian is a helper to convert to/from json
+type auxCivilian struct {
+	LoyalCitizens int `json:"loyal-citizens"`
+	RebelCitizens int `json:"rebel-citizens"`
+	TechLevel     int `json:"tech-level"`
 }
 
 func NewCivilian(pop, techLevel int) Civilian {
@@ -121,6 +134,15 @@ func (p Civilian) LifeSupportNeeded() float64 {
 	return float64(p.qty.loyal+p.qty.rebel) * 0.01 * 0.5
 }
 
+// MarshalJSON implements the json.Marshaler interface
+func (p Civilian) MarshalJSON() ([]byte, error) {
+	var aux auxCivilian
+	aux.LoyalCitizens = p.qty.loyal
+	aux.RebelCitizens = p.qty.rebel
+	aux.TechLevel = p.techLevel
+	return json.Marshal(&aux)
+}
+
 // Merge combines two population units.
 // Rebel population and tech levels are calculated as the weighted average of the units.
 func (p Civilian) Merge(q Civilian) Civilian {
@@ -168,4 +190,20 @@ func (p Civilian) Rebels() int {
 // TechLevel implements the TechLevel interface.
 func (p Civilian) TechLevel() int {
 	return p.techLevel
+}
+
+// UnmarshalJSON implements the json.Marshaler interface
+func (p *Civilian) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	var aux auxCivilian
+	if err := dec.Decode(&aux); err != nil {
+		return fmt.Errorf("decode civilian: %w", err)
+	}
+
+	p.qty.loyal = aux.LoyalCitizens
+	p.qty.rebel = aux.RebelCitizens
+	p.techLevel = aux.TechLevel
+
+	return nil
 }
