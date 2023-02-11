@@ -16,6 +16,8 @@
 
 package wge
 
+// TechLevel defines the interface for working with technology levels.
 type TechLevel interface {
-	TechLevel() int // returns the tech-level of the unit
+	// TechLevel returns the technology level of the unit.
+	TechLevel() int
 }
