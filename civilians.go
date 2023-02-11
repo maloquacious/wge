@@ -172,8 +172,8 @@ func (p Civilian) Merge(q Civilian) Civilian {
 			deltaTech := p.techLevel - n.techLevel
 			deltaRebels = p.qty.rebel * deltaTech / 100
 		} else if n.techLevel < q.techLevel {
-			deltaTech := p.techLevel - n.techLevel
-			deltaRebels = p.qty.rebel * deltaTech / 100
+			deltaTech := q.techLevel - n.techLevel
+			deltaRebels = q.qty.rebel * deltaTech / 100
 		}
 	}
 	if deltaRebels < 1 {
