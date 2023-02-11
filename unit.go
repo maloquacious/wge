@@ -16,6 +16,8 @@
 
 package wge
 
+// Unit defines the interface for working with units in the game.
 type Unit interface {
-	Code() string // returns the code for the unit
+	// Code returns the short display code for the unit.
+	Code() string
 }
