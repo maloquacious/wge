@@ -33,7 +33,8 @@ type Civilian struct {
 	techLevel int
 }
 
-// auxCivilian is a helper to convert to/from json
+// auxCivilian is a helper to convert to/from json.
+// used to implement json.Marshaler and json.Unmarshaler interfaces.
 type auxCivilian struct {
 	LoyalCitizens int `json:"loyal-citizens"`
 	RebelCitizens int `json:"rebel-citizens"`
